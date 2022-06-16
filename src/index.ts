@@ -7,7 +7,7 @@ import { basename } from "path";
 import { createHash } from "crypto";
 import { cpus } from "os";
 import { join, resolve } from "path";
-import { log } from "./lib/logging.js";
+import { excp, info, log, serv, strt } from "./lib/logging.js";
 export type fileType = "file" | "dir" | "link" | "sys";
 export type file = {
     name: string;
@@ -22,18 +22,17 @@ function getFileType(stats: Stats): fileType {
 }
 
 if (cluster.isPrimary) {
-    console.log(`Number of CPUs is ${cpus().length}`);
-    console.log(`Master ${process.pid} is running`);
+    strt("MAIN", process.pid);
+    info("THREADS", cpus().length, "->Threads");
 
     cluster.on("exit", (worker, code, signal) => {
-        console.log(`worker ${worker.process.pid} died with code ${code}`);
-        console.log("Let's fork another worker!");
+        excp("WORKER", `Worker ${worker.process.pid} died with code ${code}`);
         cluster.fork();
     });
     if (!existsSync("download")) {
         await mkdir("download");
     }
-    await writeFile(join("download", "lastReboot.txt"), new Date().toISOString());
+    // await writeFile(join("download", "Up-since.txt"), new Date().toISOString());
     let src = join("download", "source");
     if (!existsSync(src)) await mkdir(src);
     const srcStat = await lstat(src);
@@ -49,7 +48,10 @@ if (cluster.isPrimary) {
     cpus().forEach((e) => {
         cluster.fork();
     });
+
 } else {
+    const upSince = Date.now();
+    strt("WORKER", process.pid);
     const settings = JSON.parse((await readFile("settings.json")).toString());
     const app = express();
     const port = settings.port;
@@ -72,7 +74,7 @@ if (cluster.isPrimary) {
         if ((await lstat(dir)).isFile()) {
             res.set("Cache-control", `public, max-age=${3600 * 24}`);
             if (req.query.meta) {
-                log("SERVING - HASHES:", dir);
+                serv("HASHES", dir);
                 const stats = await lstat(dir);
                 const type = getFileType(stats);
                 const fileBuffer = await readFile(dir);
@@ -91,7 +93,7 @@ if (cluster.isPrimary) {
                 res.status(200).type("json").send(meta).end();
                 return;
             }
-            log("SERVING - FILE:", dir);
+            serv("FILE", dir);
             res.set('Content-Type", "application/octet-stream');
             res.attachment();
             const stream = createReadStream(dir);
@@ -100,7 +102,7 @@ if (cluster.isPrimary) {
         }
         res.set("Cache-control", `no-cache`);
         if (req.headers["content-type"] == "json") {
-            log("SERVING - DIR:", dir);
+            serv("DIR", req.path);
             let f = req.path.split("/");
 
             const links: Array<file> = [];
@@ -108,6 +110,8 @@ if (cluster.isPrimary) {
             if (f.pop() || f.pop()) {
                 f.push("");
                 links.push({ name: "back", link: f.join("/"), type: "sys" });
+            }else{
+                links.push({ name: "up-since", link: "./#", type: "sys", mod:upSince });
             }
             const dirLS = await readdir(dir);
             for (let index = 0; index < dirLS.length; index++) {
@@ -124,14 +128,12 @@ if (cluster.isPrimary) {
                         name: e,
                         link: `${req.path}${req.path.endsWith("/") ? "" : "/"}${e}`,
                     });
-                } catch (e) {}
+                } catch (e) { }
             }
             res.status(200).type("json").send(JSON.stringify(links)).end();
         } else {
             res.status(200).type("html").send(await readFile('main.html')).end()
         }
     });
-
     app.listen(port);
-    console.log(`Client ${process.pid} is running`);
 }

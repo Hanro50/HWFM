@@ -23,11 +23,12 @@ let th2 = document.createElement("th");
 th2.innerText = "Type";
 trh.appendChild(th2);
 let th3 = document.createElement("th");
-th3.innerText = "Date modified";
+th3.innerText = "Size";
 trh.appendChild(th3);
 let th4 = document.createElement("th");
-th4.innerText = "Size";
+th4.innerText = "Date modified";
 trh.appendChild(th4);
+
 
 table.appendChild(trh);
 
@@ -54,18 +55,20 @@ json.forEach((e) => {
     trd.appendChild(td2);
 
     let td3 = document.createElement("td");
+    td3.innerText = e.size ? humanFileSize(e.size) : "--";
+    trd.appendChild(td3);
+
+
+    let td4 = document.createElement("td");
     if (e.mod) {
         const d = new Date(e.mod);
         let options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" };
-        td3.innerText = d.toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale, options);
+        td4.innerText = d.toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale, options);
     } else {
-        td3.innerText = "";
+        td4.innerText = "--";
     }
-    trd.appendChild(td3);
-
-    let td4 = document.createElement("td");
-    td4.innerText = e.size ? humanFileSize(e.size) : "--";
     trd.appendChild(td4);
+
 
     table.appendChild(trd);
 });
