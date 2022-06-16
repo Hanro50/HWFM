@@ -127,3 +127,4 @@ dist
 .pnp.*
 
 download
+package-lock.json
