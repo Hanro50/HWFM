@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>File browser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Hanro50.net.za Web-based file browser">
+    <link rel="icon" type="image/ico" href="/favicon.ico">
+    <style>
+        :root {
+            --text: #000;
+            --background: #eee;
+            --border: #000;
+            --accent: #fff;
+        }
+
+        html {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background-color: var(--background);
+            color: var(--text);
+            height: calc(100% - 16px);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table,
+        td,
+        th,
+        #themer {
+            border: solid 1px var(--border);
+        }
+
+
+
+
+        table,
+        .button {
+            background-color: var(--accent);
+            border-radius: 15px;
+            width: 100%;
+            padding: 5px;
+        }
+
+        div,
+        footer {
+            text-align: center;
+        }
+
+        div,
+        tr {
+
+            transition-duration: 0.5s;
+        }
+
+        tr:hover,
+        div:hover,
+        .button:hover {
+            background-color: var(--background);
+        }
+
+        *:focus {
+            outline: none;
+        }
+
+        .w {
+            color: red;
+            background-color: var(--background);
+        }
+
+
+
+        @media not screen and (max-width: 700px) {
+
+            body {
+                width: 700px;
+                min-width: 700px;
+            }
+
+
+        }
+
+        @media only screen and (max-width: 700px) {
+
+            body {
+                width: 99%;
+                min-width: 0px;
+            }
+        }
+
+        tr,
+        td {
+            width: auto;
+        }
+
+        tr:nth-child(1),
+        td:nth-child(1) {
+            width: 60%;
+        }
+
+        tr:nth-child(3),
+        td:nth-child(3) {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        br{
+        height: 10px;
+        }
+    </style>
+    <style id="dark">
+        :root {
+            --text: #fff;
+            --background: rgb(20, 20, 20);
+            --border: rgb(30, 30, 30);
+            --accent: rgb(40, 40, 40);
+
+        }
+    </style>
+    <script>
+        const theme = document.getElementById("dark");
+
+        function switchTheme() {
+            if (theme.parentElement) {
+                theme.remove()
+                localStorage.setItem("light", "true")
+            } else {
+                document.head.appendChild(theme)
+                localStorage.removeItem("light")
+            }
+        }
+        if (localStorage.getItem("light")) {
+            switchTheme()
+        }
+
+    </script>
+</head>
+
+</head>
+
+<body>
+    <h1>File Handler:<span id="fhandler"></span></h1>
+    <script type="module" src="/script/files.js"></script>
+    <table id="content"></table>
+    &nbsp;<br>
+    <div class="button" onclick="switchTheme()">
+        Switch theme
+    </div>
+    &nbsp;<br>
+    <div class="button" onclick="document.location.href=`https://www.hanro50.net.za`">
+        Back to main website
+    </div>
+    &nbsp;<br>
+    <footer>HWFM&nbsp;Copyright&nbsp;(C)&nbsp;2022&nbsp;Hanro50:GPLv3</footer>
+</body>
+
+</html>
