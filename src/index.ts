@@ -15,9 +15,7 @@ export type file = {
 if (cluster.isPrimary) {
     console.log(`Number of CPUs is ${cpus().length}`);
     console.log(`Master ${process.pid} is running`);
-    cpus().forEach(e => {
-        cluster.fork()
-    })
+
     cluster.on("exit", (worker, code, signal) => {
         console.log(`worker ${worker.process.pid} died with code ${code}`);
         console.log("Let's fork another worker!");
@@ -34,9 +32,17 @@ if (cluster.isPrimary) {
         symlinkSync(resolve("src"), src, "junction");
     }
     copyFileSync("LICENSE", join("download", "LICENSE"))
+    if (!existsSync("settings.json")) {
+        writeFileSync("settings.json", JSON.stringify({ port: 3000 }))
+    }
+
+    cpus().forEach(e => {
+        cluster.fork()
+    })
 } else {
+    const settings = JSON.parse(readFileSync("settings.json").toString())
     const app = express();
-    const port = 3000;
+    const port = settings.port;
 
     app.use("/favicon.ico", (req, res) => {
         res.status(200).send(readFileSync("favicon.ico")).end();
