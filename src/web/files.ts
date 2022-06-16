@@ -1,4 +1,4 @@
-import type { file } from "../index.js";
+import type { file, fileType } from "../index.js";
 export const blank = "";
 const r = await fetch(window.location.pathname, { method: "POST", headers: { "content-type": "json" } })
 const json: Array<file> = await r.json();
@@ -20,9 +20,20 @@ table.appendChild(trh);
 
 
 console.log(json)
+const srtMap = new Map<fileType, number>();
+srtMap.set("dir", 1).set("link", 0.5).set("file", 0.25).set("sys", 0);
+json.sort((a, b) => {
+    if (a.type == b.type) {
+        return a.name.localeCompare(b.name);
+    } else {
+        return (srtMap.get(a.type) || 0) - (srtMap.get(b.type) || 0)
+    }
+})
+
+
 json.forEach(e => {
     const trd = document.createElement("tr");
-    trd.onclick = () =>window.location.assign(e.link);
+    trd.onclick = () => window.location.assign(e.link);
 
     let td1 = document.createElement("td");
     td1.innerText = e.name;

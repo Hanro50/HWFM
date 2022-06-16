@@ -4,11 +4,11 @@ import express from "express";
 import { copyFileSync, createReadStream, existsSync, fstatSync, lstatSync, mkdirSync, readdirSync, readFileSync, symlinkSync, unlinkSync, writeFileSync } from "fs";
 import { cpus } from "os";
 import { join, resolve } from "path";
-
+export type fileType = "file" | "dir" | "link" | "sys";
 export type file = {
     name: string,
     link: string,
-    type: "file" | "dir" | "link",
+    type: fileType,
     mod?: number
 }
 
@@ -75,7 +75,7 @@ if (cluster.isPrimary) {
 
             if (f.pop() || f.pop()) {
                 f.push('')
-                links.push({ name: "back", link: f.join("/"), type: "dir" })
+                links.push({ name: "back", link: f.join("/"), type: "sys" })
 
             } readdirSync(dir).forEach(e => {
                 try {
