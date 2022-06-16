@@ -1,16 +1,24 @@
 import cluster from "cluster";
 
 import express from "express";
-import { createReadStream, existsSync } from "fs";
+import { createReadStream, existsSync, Stats } from "fs";
 import { mkdir, writeFile, lstat, unlink, symlink, copyFile, readFile, readdir } from "fs/promises";
+import { basename } from "path";
+import { createHash } from "crypto";
 import { cpus } from "os";
 import { join, resolve } from "path";
+import { log } from "./lib/logging.js";
 export type fileType = "file" | "dir" | "link" | "sys";
 export type file = {
-    name: string,
-    link: string,
-    type: fileType,
-    mod?: number
+    name: string;
+    link: string;
+    size?: number;
+    type: fileType;
+    mod?: number;
+};
+
+function getFileType(stats: Stats): fileType {
+    return stats.isDirectory() ? "dir" : stats.isSymbolicLink() ? "link" : "file";
 }
 
 if (cluster.isPrimary) {
@@ -23,82 +31,109 @@ if (cluster.isPrimary) {
         cluster.fork();
     });
     if (!existsSync("download")) {
-        await mkdir("download")
+        await mkdir("download");
     }
     await writeFile(join("download", "lastReboot.txt"), new Date().toISOString());
     let src = join("download", "source");
-    const srcStat = await lstat(src)
+    if (!existsSync(src)) await mkdir(src);
+    const srcStat = await lstat(src);
     if (srcStat.isSymbolicLink()) {
-        await unlink(src)
+        await unlink(src);
         await symlink(resolve("src"), src, "junction");
     }
-    copyFile("LICENSE", join("download", "LICENSE"))
+    copyFile("LICENSE", join("download", "LICENSE"));
     if (!existsSync("settings.json")) {
-        await writeFile("settings.json", JSON.stringify({ port: 3000 }))
+        await writeFile("settings.json", JSON.stringify({ port: 3000 }));
     }
 
-    cpus().forEach(e => {
-        cluster.fork()
-    })
+    cpus().forEach((e) => {
+        cluster.fork();
+    });
 } else {
-    const settings = JSON.parse((await readFile("settings.json")).toString())
+    const settings = JSON.parse((await readFile("settings.json")).toString());
     const app = express();
     const port = settings.port;
 
     app.use("/favicon.ico", async (req, res) => {
-        res.status(200).send(await readFile("favicon.ico")).end();
-    })
+        res.status(200)
+            .send(await readFile("favicon.ico"))
+            .end();
+    });
     app.use("/script", express.static("dist/web"));
     app.get("/api/back", (req, res) => {
-        res.redirect(settings.main || "/")
-    })
+        res.redirect(settings.main || "/");
+    });
+
     app.use(async (req, res) => {
-        console.log(req.headers)
-        if (req.url.includes(".."))
-            return res.status(403).end();
-        const dir = join(...["download", ...req.url.split("/")]);
-        if (!existsSync(dir)) return res.status(404);
+        if (req.url.includes("..")) return res.status(403).end();
+        const dir = join(...["download", ...req.path.split("/")]);
+        if (!existsSync(dir)) return res.status(404).end();
+
         if ((await lstat(dir)).isFile()) {
-            res.set('Cache-control', `public, max-age=${3600 * 24}`)
+            res.set("Cache-control", `public, max-age=${3600 * 24}`);
+            if (req.query.meta) {
+                log("SERVING - HASHES:", dir);
+                const stats = await lstat(dir);
+                const type = getFileType(stats);
+                const fileBuffer = await readFile(dir);
+                const hash = {
+                    md5: createHash("md5").update(fileBuffer).digest("hex"),
+                    sha1: createHash("sha1").update(fileBuffer).digest("hex"),
+                    sha256: createHash("sha256").update(fileBuffer).digest("hex"),
+                };
+                const meta = {
+                    size: stats.size,
+                    name: basename(dir),
+                    path: req.path,
+                    type,
+                    hash,
+                };
+                res.status(200).type("json").send(meta).end();
+                return;
+            }
+            log("SERVING - FILE:", dir);
             res.set('Content-Type", "application/octet-stream');
             res.attachment();
             const stream = createReadStream(dir);
-            stream.pipe(res, { end: true })
-            return
+            stream.pipe(res, { end: true });
+            return;
         }
-        res.set('Cache-control', `no-cache`)
+        res.set("Cache-control", `no-cache`);
         if (req.headers["content-type"] == "json") {
-
-            console.log("html")
-            let f = req.url.split('/')
+            log("SERVING - DIR:", dir);
+            let f = req.path.split("/");
 
             const links: Array<file> = [];
 
             if (f.pop() || f.pop()) {
-                f.push('')
-                links.push({ name: "back", link: f.join("/"), type: "sys" })
-
+                f.push("");
+                links.push({ name: "back", link: f.join("/"), type: "sys" });
             }
-            const dirLS = (await readdir(dir))
+            const dirLS = await readdir(dir);
             for (let index = 0; index < dirLS.length; index++) {
                 const e = dirLS[index];
 
                 try {
                     const file = join(dir, e);
-                    const fstad = await lstat(file)
-                    let type: "file" | "dir" | "link" = fstad.isDirectory() ? "dir" : fstad.isSymbolicLink() ? "link" : "file"
-                    links.push({ mod: fstad.mtime.getTime(), type, name: e, link: `${req.url}${req.url.endsWith("/") ? "" : "/"}${e}` })
-                } catch (e) {
-
-                }
+                    const stats = await lstat(file);
+                    const type = getFileType(stats);
+                    links.push({
+                        type,
+                        mod: stats.mtime.getTime(),
+                        size: type == "dir" ? undefined : stats.size,
+                        name: e,
+                        link: `${req.path}${req.path.endsWith("/") ? "" : "/"}${e}`,
+                    });
+                } catch (e) {}
             }
-            console.log(req.url)
-            res.status(200).type("json").send(JSON.stringify(links))
-
+            res.status(200).type("json").send(JSON.stringify(links)).end();
         } else {
-            res.status(200).type("html").send(await readFile('404.html')).end()
+            res.status(200)
+                .type("html")
+                .send(await readFile("404.html"))
+                .end();
         }
-    })
+    });
 
     app.listen(port);
     console.log(`Client ${process.pid} is running`);
