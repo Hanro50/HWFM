@@ -48,6 +48,9 @@ if (cluster.isPrimary) {
         res.status(200).send(readFileSync("favicon.ico")).end();
     })
     app.use("/script", express.static("dist/web"));
+    app.get("/api/back", (req, res) => {
+        res.redirect(settings.main || "/")
+    })
     app.use((req, res) => {
         console.log(req.headers)
         if (req.url.includes(".."))
