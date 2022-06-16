@@ -128,10 +128,7 @@ if (cluster.isPrimary) {
             }
             res.status(200).type("json").send(JSON.stringify(links)).end();
         } else {
-            res.status(200)
-                .type("html")
-                .send(await readFile("404.html"))
-                .end();
+            res.status(200).type("html").send(await readFile('main.html')).end()
         }
     });
 
