@@ -1,6 +1,6 @@
 import type { file } from "../index.js";
 export const blank = "";
-const r = await fetch(window.location.pathname, {method:"POST", headers: { "content-type": "json" } })
+const r = await fetch(window.location.pathname, { method: "POST", headers: { "content-type": "json" } })
 const json: Array<file> = await r.json();
 const fhandler = document.getElementById("fhandler") as HTMLSpanElement
 fhandler.innerText = `<${window.location.pathname}>`
@@ -22,12 +22,8 @@ table.appendChild(trh);
 console.log(json)
 json.forEach(e => {
     const trd = document.createElement("tr");
-    if (e.type == "dir") {
-        trd.onclick = () => {
-            window.location.replace(e.link);
-        }
-    } else
-        trd.onclick = () => window.open(e.link);
+    trd.onclick = () =>window.location.assign(e.link);
+
     let td1 = document.createElement("td");
     td1.innerText = e.name;
     trd.appendChild(td1)
