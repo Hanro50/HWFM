@@ -10,65 +10,89 @@ export function humanFileSize(size: number) {
 }
 
 export const blank = "";
-const r = await fetch(window.location.pathname, { method: "POST", headers: { "content-type": "json" } });
-const json: Array<file> = await r.json();
-const fhandler = document.getElementById("fhandler") as HTMLSpanElement;
-fhandler.innerText = `<${window.location.pathname}>`;
+
 const table = document.getElementById("content") as HTMLTableElement;
-let trh = document.createElement("tr");
-let th1 = document.createElement("th");
-th1.innerText = "Name";
-trh.appendChild(th1);
-let th2 = document.createElement("th");
-th2.innerText = "Type";
-trh.appendChild(th2);
-let th3 = document.createElement("th");
-th3.innerText = "Size";
-trh.appendChild(th3);
-let th4 = document.createElement("th");
-th4.innerText = "Date modified";
-trh.appendChild(th4);
+const loadingIndicator = document.getElementById("loading-indicator") as HTMLParagraphElement;
+const fileHandler = document.getElementById("fhandler") as HTMLSpanElement;
 
+async function loadList(path: string) {
+    fileHandler.innerText = `<${path}>`;
 
-table.appendChild(trh);
+    loadingIndicator.style.display = "flex";
+    table.style.display = "none";
 
-const srtMap = new Map<fileType, number>();
-srtMap.set("dir", 1).set("link", 0.5).set("file", 0.25).set("sys", 0);
-json.sort((a, b) => {
-    if (a.type == b.type) {
-        return a.name.localeCompare(b.name);
-    } else {
-        return (srtMap.get(a.type) || 0) - (srtMap.get(b.type) || 0);
-    }
-});
+    const r = await fetch(path, { method: "POST", headers: { "content-type": "json" } });
+    const json: Array<file> = await r.json();
 
-json.forEach((e) => {
-    const trd = document.createElement("tr");
-    trd.onclick = () => window.location.assign(e.link);
+    loadingIndicator.style.display = "none";
+    table.style.display = "block";
+    table.innerHTML = "";
 
-    let td1 = document.createElement("td");
-    td1.innerText = e.name;
-    trd.appendChild(td1);
+    let trh = document.createElement("tr");
+    let th1 = document.createElement("th");
+    th1.innerText = "Name";
+    trh.appendChild(th1);
 
-    let td2 = document.createElement("td");
-    td2.innerText = e.type;
-    trd.appendChild(td2);
+    let th2 = document.createElement("th");
+    th2.innerText = "Type";
+    trh.appendChild(th2);
 
-    let td3 = document.createElement("td");
-    td3.innerText = e.size ? humanFileSize(e.size) : "--";
-    trd.appendChild(td3);
+    let th3 = document.createElement("th");
+    th3.innerText = "Size";
+    trh.appendChild(th3);
 
+    let th4 = document.createElement("th");
+    th4.innerText = "Date modified";
+    trh.appendChild(th4);
 
-    let td4 = document.createElement("td");
-    if (e.mod) {
-        const d = new Date(e.mod);
-        let options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" };
-        td4.innerText = d.toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale, options);
-    } else {
-        td4.innerText = "--";
-    }
-    trd.appendChild(td4);
+    table.appendChild(trh);
 
+    const srtMap = new Map<fileType, number>();
+    srtMap.set("dir", 1).set("link", 0.5).set("file", 0.25).set("sys", 0);
+    json.sort((a, b) => {
+        if (a.type == b.type) {
+            return a.name.localeCompare(b.name);
+        } else {
+            return (srtMap.get(a.type) || 0) - (srtMap.get(b.type) || 0);
+        }
+    });
 
-    table.appendChild(trd);
-});
+    json.forEach((e) => {
+        const trd = document.createElement("tr");
+        trd.onclick = () => {
+            if (e.type == "file") {
+                window.location.assign(e.link);
+                return;
+            }
+
+            loadList(e.link);
+            history.pushState({}, "", e.link);
+        };
+
+        let td1 = document.createElement("td");
+        td1.innerText = e.name;
+        trd.appendChild(td1);
+
+        let td2 = document.createElement("td");
+        td2.innerText = e.type;
+        trd.appendChild(td2);
+
+        let td3 = document.createElement("td");
+        td3.innerText = e.size ? humanFileSize(e.size) : "--";
+        trd.appendChild(td3);
+
+        let td4 = document.createElement("td");
+        if (e.mod) {
+            const d = new Date(e.mod);
+            let options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" };
+            td4.innerText = d.toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale, options);
+        } else {
+            td4.innerText = "--";
+        }
+        trd.appendChild(td4);
+
+        table.appendChild(trd);
+    });
+}
+
+loadList(window.location.pathname);
