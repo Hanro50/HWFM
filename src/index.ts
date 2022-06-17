@@ -48,7 +48,6 @@ if (cluster.isPrimary) {
     cpus().forEach((e) => {
         cluster.fork();
     });
-
 } else {
     const upSince = Date.now();
     strt("WORKER", process.pid);
@@ -110,8 +109,8 @@ if (cluster.isPrimary) {
             if (f.pop() || f.pop()) {
                 f.push("");
                 links.push({ name: "back", link: f.join("/"), type: "sys" });
-            }else{
-                links.push({ name: "up-since", link: "./#", type: "sys", mod:upSince });
+            } else {
+                links.push({ name: "up-since", link: "./#", type: "sys", mod: upSince });
             }
             const dirLS = await readdir(dir);
             for (let index = 0; index < dirLS.length; index++) {
@@ -124,15 +123,18 @@ if (cluster.isPrimary) {
                     links.push({
                         type,
                         mod: stats.mtime.getTime(),
-                        size: type == "dir" ? undefined : stats.size,
+                        size: type == "file" ? stats.size : undefined,
                         name: e,
                         link: `${req.path}${req.path.endsWith("/") ? "" : "/"}${e}`,
                     });
-                } catch (e) { }
+                } catch (e) {}
             }
             res.status(200).type("json").send(JSON.stringify(links)).end();
         } else {
-            res.status(200).type("html").send(await readFile('main.html')).end()
+            res.status(200)
+                .type("html")
+                .send(await readFile("main.html"))
+                .end();
         }
     });
     app.listen(port);
