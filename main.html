@@ -6,134 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Hanro50.net.za Web-based file browser">
     <link rel="icon" type="image/ico" href="/favicon.ico">
+    <link href="https://styles.hanro50.net.za/v1/main,table" rel="stylesheet">
     <style>
-        :root {
-            --text: #000;
-            --background: #eee;
-            --border: #000;
-            --accent: #fff;
-        }
-
-        html {
-            height: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        body {
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            background-color: var(--background);
-            color: var(--text);
-            height: calc(100% - 16px);
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        table,
-        td,
-        th,
-        #themer {
-            border: solid 1px var(--border);
-        }
-
-        #content {
-            display: none;
-        }
-
         #loading-indicator {
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
         #loading-indicator svg {
             height: 26px;
-        }
-
-        table,
-        .button,
-        #loading-indicator {
-            background-color: var(--accent);
-            border-radius: 15px;
-            width: 100%;
-            padding: 5px;
-        }
-
-        div,
-        footer {
-            text-align: center;
-        }
-
-        div,
-        tr {
-
-            transition-duration: 0.5s;
-        }
-
-        tr:hover,
-        div:hover,
-        .button:hover {
-            background-color: var(--background);
-        }
-
-        td {
-            cursor: pointer;
-        }
-
-        *:focus {
-            outline: none;
-        }
-
-        .w {
-            color: red;
-            background-color: var(--background);
-        }
-
-
-
-        @media not screen and (max-width: 700px) {
-
-            body {
-                width: 700px;
-                min-width: 700px;
-            }
-
-
-        }
-
-        @media only screen and (max-width: 700px) {
-
-            body {
-                width: 99%;
-                min-width: 0px;
-            }
-        }
-
-        tr,
-        td {
-            width: auto;
-        }
-
-        tr:nth-child(1),
-        td:nth-child(1) {
-            width: 60%;
-        }
-
-        tr,
-        td {
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        br {
-            height: 10px;
         }
     </style>
     <style id="dark">
@@ -169,118 +51,99 @@
 <body>
     <h1>File Handler:<span id="fhandler"></span></h1>
     <script type="module" src="/script/files.js"></script>
-    <p id="loading-indicator">
-        <svg xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100"
+    <p id="loading-indicator" class="element">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid">
             <g transform="rotate(0 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.9166666666666666s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.9166666666666666s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(30 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.8333333333333334s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.8333333333333334s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(60 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.75s" repeatCount="indefinite" />
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.75s"
+                        repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(90 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.6666666666666666s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.6666666666666666s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(120 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.5833333333333334s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.5833333333333334s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(150 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.5s" repeatCount="indefinite" />
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.5s"
+                        repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(180 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.4166666666666667s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.4166666666666667s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(210 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.3333333333333333s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.3333333333333333s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(240 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.25s" repeatCount="indefinite" />
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.25s"
+                        repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(270 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.16666666666666666s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.16666666666666666s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(300 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="-0.08333333333333333s"
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.08333333333333333s"
                         repeatCount="indefinite" />
                 </rect>
             </g>
             <g transform="rotate(330 50 50)">
-                <rect x="47" y="24" rx="3" ry="6" width="6" height="12"
-                    fill="#ffffff">
-                    <animate attributeName="opacity" values="1;0" keyTimes="0;1"
-                        dur="1s" begin="0s" repeatCount="indefinite" />
+                <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#ffffff">
+                    <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="0s"
+                        repeatCount="indefinite" />
                 </rect>
             </g>
             <!-- [ldio] generated by https://loading.io/ -->
         </svg>
         Loading...
     </p>
-    <table id="content">
-    </table>
+    <div class="element">
+        <table id="content">
+        </table>
+    </div>
     &nbsp;<br>
-    <div class="button" onclick="switchTheme()">
+    <div class="element button" onclick="switchTheme()">
         Switch theme
     </div>
     &nbsp;<br>
-    <div class="button" onclick="document.location.href=`/api/back`">
+    <div class="element button" onclick="document.location.href=`/api/back`">
         Back to main website
     </div>
-    &nbsp;<br>
-    <footer>
+
+    <footer id="license">
         HWFM&nbsp;&lt;GPLv3&gt;&nbsp;Copyright&nbsp;(C)&nbsp;2022&nbsp;Hanro50
     </footer>
 </body>

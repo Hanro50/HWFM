@@ -12,20 +12,23 @@ export function humanFileSize(size: number) {
 export const blank = "";
 
 const table = document.getElementById("content") as HTMLTableElement;
+const tableCon = table.parentElement as HTMLDivElement;
 const loadingIndicator = document.getElementById("loading-indicator") as HTMLParagraphElement;
 const fileHandler = document.getElementById("fhandler") as HTMLSpanElement;
-
+window.onpopstate = function () {
+    loadList(window.location.pathname);
+}
 async function loadList(path: string) {
     fileHandler.innerText = `<${path}>`;
 
     loadingIndicator.style.display = "flex";
-    table.style.display = "none";
+    tableCon.style.display = "none";
 
     const r = await fetch(path, { method: "POST", headers: { "content-type": "json" } });
     const json: Array<file> = await r.json();
 
     loadingIndicator.style.display = "none";
-    table.style.display = "block";
+    tableCon.style.display = "block";
     table.innerHTML = "";
 
     let trh = document.createElement("tr");
@@ -68,6 +71,7 @@ async function loadList(path: string) {
             loadList(e.link);
             history.pushState({}, "", e.link);
         };
+        trd.className = "button"
 
         let td1 = document.createElement("td");
         td1.innerText = e.name;
