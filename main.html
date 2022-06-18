@@ -7,6 +7,8 @@
     <meta name="description" content="Hanro50.net.za Web-based file browser">
     <link rel="icon" type="image/ico" href="/favicon.ico">
     <link href="https://styles.hanro50.net.za/v1/main,table" rel="stylesheet">
+    <script src="https://styles.hanro50.net.za/themer.js"></script>
+
     <style>
         #loading-indicator {
             margin: 0;
@@ -14,36 +16,28 @@
             justify-content: center;
             align-items: center;
         }
+
         #loading-indicator svg {
             height: 26px;
         }
-    </style>
-    <style id="dark">
-        :root {
-            --text: #fff;
-            --background: rgb(20, 20, 20);
-            --border: rgb(30, 30, 30);
-            --accent: rgb(40, 40, 40);
 
+        td:nth-child(1) {
+            width: 60%;
+            text-align: left;
+        }
+
+        td:nth-child(4) {
+            width: 30%;
+        }
+
+        td:nth-child(1),
+        td:nth-child(4) {
+            max-width: 0;
+            min-width: 0%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
-    <script>
-        const theme = document.getElementById("dark");
-
-        function switchTheme() {
-            if (theme.parentElement) {
-                theme.remove()
-                localStorage.setItem("light", "true")
-            } else {
-                document.head.appendChild(theme)
-                localStorage.removeItem("light")
-            }
-        }
-        if (localStorage.getItem("light")) {
-            switchTheme()
-        }
-
-    </script>
 </head>
 
 </head>
